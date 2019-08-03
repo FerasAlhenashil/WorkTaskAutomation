@@ -14,34 +14,64 @@ class WorkTaskAutomation(object):
                         titles.append(cell.value)
         return titles
 
-    def ws_Melanie(self, ws):
-        melanie = []
+    def ws_art_works(self, ws):
+        art_works = []
         for row in ws.values:
             for value in row:
                 if value == 'Melanie':
-                    melanie.append(row)
-        return melanie
+                    art_works.append(row)
+        return art_works
+
+    def ws_schedule(self, art_works):
+        schedule = []
+        for i in range(len(art_works)):
+            start = art_works[i].index('DV Shell due ')
+            end = art_works[i].index('ICR')
+            schedule.append(art_works[i][start:end])
+            print(schedule[i])
+        return schedule
+
+    def ws_schedule_dates(self, art_works, ws):
+        schedule_dates = []
+        dates = []
+        for row in ws.values:
+            for value in row:
+                dates.append(value)
+
+        for i in range(len(art_works)):
+            start = art_works[i].index('DV Shell due ')
+            end = art_works[i].index('ICR')
+            schedule_dates.append(dates[start:end])
+        return schedule_dates
+
 
     def API(self):
         os.chdir('C:\\Users\\Feras\\Documents\\Work_Task_Automaiton')
-        wb = openpyxl.load_workbook('Copy of 190510_IN_Rebrand_Schedule_50116 (1).xlsm')
-        print(type(wb))
+        wb = openpyxl.load_workbook('50117_Rebrand_Schedule_FR_and_BEDE_190624.xlsm')
         ws = wb.active
-        melanie = self.ws_Melanie(ws)
-
-        for i in range(len(melanie)):
-            print(melanie[i])
-
+        #each art_work is a job from the schedule
+        art_works = self.ws_art_works(ws)
         titles = self.ws_titles(ws)
-        print(titles)
+        schedule = self.ws_schedule(art_works)
+        schedule_dates = self.ws_schedule_dates(art_works, ws)
 
+        for i in range(len(art_works)):
+            print(art_works[i])
 
+        for i in range(len(schedule)):
+            print(schedule[i])
+            print(schedule_dates[i])
+            # the last date on schedule is: schedule_dates[i][len(schedule_dates[i]) - 1]
+            #print(schedule_dates[i][len(schedule_dates[i])-1].value)
+        x = 28
+        print(art_works[2][6])
+        print(schedule_dates[2][x].month, '/', schedule_dates[2][x].day, end=' ')
+        print(schedule[2][x])
 
 
 def main():
     obj = WorkTaskAutomation()
     obj.API()
-
 
 if __name__ == '__main__':
     main()
