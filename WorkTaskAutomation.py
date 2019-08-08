@@ -25,10 +25,16 @@ class WorkTaskAutomation(object):
     def ws_schedule(self, art_works):
         schedule = []
         for i in range(len(art_works)):
-            start = art_works[i].index('DV Shell due ')
-            end = art_works[i].index('ICR')
-            schedule.append(art_works[i][start:end])
-            print(schedule[i])
+            try:
+                start = art_works[i].index('DV Shell due ')
+                end = art_works[i].index('ICR')
+                schedule.append(art_works[i][start:end])
+                #print(schedule[i])
+            except ValueError:
+                start = self.odd_job(art_works[i])
+                end = len(art_works[i])
+                schedule.append(art_works[i][start:end])
+                #print(schedule[i])
         return schedule
 
     def ws_schedule_dates(self, art_works, ws):
@@ -37,13 +43,23 @@ class WorkTaskAutomation(object):
         for row in ws.values:
             for value in row:
                 dates.append(value)
-
         for i in range(len(art_works)):
-            start = art_works[i].index('DV Shell due ')
-            end = art_works[i].index('ICR')
-            schedule_dates.append(dates[start:end])
+            try:
+                start = art_works[i].index('DV Shell due ')
+                end = art_works[i].index('ICR')
+                schedule_dates.append(dates[start:end])
+            except ValueError:
+                start = self.odd_job(art_works[i])
+                end = len(art_works[i])
+                schedule_dates.append(dates[start:end])
         return schedule_dates
 
+    def odd_job(self, job):
+        try:
+            start = job.index('PM Prep')
+            return start
+        except ValueError:
+            print(job[7], 'Error: has no DV Shell due nor PM Prep tasks')
 
     def API(self):
         os.chdir('C:\\Users\\Feras\\Documents\\Work_Task_Automaiton')
@@ -63,7 +79,7 @@ class WorkTaskAutomation(object):
             print(schedule_dates[i])
             # the last date on schedule is: schedule_dates[i][len(schedule_dates[i]) - 1]
             #print(schedule_dates[i][len(schedule_dates[i])-1].value)
-        x = 28
+        x = 0
         print(art_works[2][6])
         print(schedule_dates[2][x].month, '/', schedule_dates[2][x].day, end=' ')
         print(schedule[2][x])
