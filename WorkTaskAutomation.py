@@ -133,7 +133,7 @@ class WorkTaskAutomation(object):
         cell5 = tracker_ws.cell(row=fini-1, column=5)
         cell6 = tracker_ws.cell(row=fini-1, column=6)
 
-        cell1.value = titles[i] + '   ' + '(' + art_works[project_starting_index][3] + ')'
+        cell1.value = str(titles[i]) + '   ' + '(' + str(art_works[project_starting_index][3]) + ')'
         cell2.value = 'GK'
         cell3.value = 'DTP'
         cell4.value = 'Status'
@@ -171,6 +171,7 @@ class WorkTaskAutomation(object):
         return i
 
     def API(self):
+        #'R:\\LifeScan\\_Lifescan_General\\20_Personal_Folders\\Melanie\\Schedules'
         os.chdir('C:\\Users\\Feras\\Documents\\Work_Task_Automaiton')
         schedule_file = input('Enter the schedule file name: ')
         schedule_file = schedule_file + '.xlsm'
@@ -202,7 +203,8 @@ class WorkTaskAutomation(object):
         try:
             tracker_wb.save(tracker_file2)
         except PermissionError:
-            print('Unable to save to the tracker. Please make sure the file isn\'t open')
+            print('\nUnable to save to the tracker. Please make sure the file isn\'t open')
+            input('\nPress any key to exit the program')
 
 
 def main():
