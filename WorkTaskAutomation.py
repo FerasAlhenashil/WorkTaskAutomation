@@ -2,6 +2,29 @@ import os
 import warnings
 from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle, Font, PatternFill, Alignment, Border, Side
+import tkinter as tk
+from tkinter import *
+from tkinter import messagebox
+import tkinter.font
+
+
+class GUI(tk.Frame):
+    def __init__(self, master):
+        self.window = master
+        tk.Frame.__init__(self, master)
+        self.window.title("Tracker Generator")
+        w = 354
+        h = 150
+        self.window.minsize(width=w, height=h)
+        ws = self.window.winfo_screenwidth()
+        hs = self.window.winfo_screenheight()
+        x = (ws/2) - (w/2) - h
+        y = (hs / 2) - (h / 2) - h
+        self.window.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        tk_rgb = "#%02x%02x%02x" % (240, 212, 252)
+        self.window.configure(bg=tk_rgb)
+        childObj = WorkTaskAutomation(self)
+        self.window.mainloop()
 
 
 class WorkTaskAutomation(object):
@@ -10,8 +33,28 @@ class WorkTaskAutomation(object):
     schedule = []
     schedule_dates = []
 
-    def __init__(self):
-        pass
+    def __init__(self, gui):
+        self.gui = gui
+        helv36 = tkinter.font.Font(family="Comic Sans MS", size=11, weight="bold")
+        tk_rgb = "#%02x%02x%02x" % (240, 212, 252)
+        tkb_rgb = "#%02x%02x%02x" % (252, 169, 191)
+        schedule_label = Label(gui.window, text="Schedule file:", font=helv36, bg=tk_rgb, pady=3)
+        schedule_label.grid(row=0, column=0)
+        schedule_file = StringVar()
+        self.schedule_E = Entry(gui.window, textvariable=schedule_file, width=35)
+        self.schedule_E.grid(row=0, column=1)
+        tracker_label1 = Label(gui.window, text="Tracker to load:", font=helv36, bg=tk_rgb, pady=3)
+        tracker_label1.grid(row=1, column=0)
+        tracker_file1 = StringVar()
+        self.tracker_E1 = Entry(gui.window, textvariable=tracker_file1, width=35)
+        self.tracker_E1.grid(row=1, column=1)
+        tracker_label2 = Label(gui.window, text="Tracker to save:", font=helv36, bg=tk_rgb, pady=3)
+        tracker_label2.grid(row=2, column=0)
+        tracker_file2 = StringVar()
+        self.tracker_E2 = Entry(gui.window, textvariable=tracker_file2, width=35)
+        self.tracker_E2.grid(row=2, column=1)
+        self.button = tk.Button(gui.window, text="Generate  tracker",font=helv36, command=self.API,
+                                relief=RIDGE, bg=tkb_rgb, padx=30).grid(row=3, column=1, pady=(10, 0))
 
     def ws_titles(self, ws):
         for row in ws:
@@ -151,47 +194,45 @@ class WorkTaskAutomation(object):
                 break
 
     def API(self):
-        #'R:\\LifeScan\\_Lifescan_General\\20_Personal_Folders\\Melanie\\Schedules'
-        os.chdir('C:\\Users\\Feras\\Documents\\Work_Task_Automaiton')
-        schedule_file = input('Enter the schedule file name: ')
-        schedule_file = schedule_file + '.xlsm'
-        try:
-            wb = load_workbook(schedule_file)
-        except FileNotFoundError:
-            print('Unable to find the schedule file. Make sure it exists at the expected location')
-            quit()
-        ws = wb.active
-        tracker_file = input('Enter the tracker file to load: ')
-        tracker_file = tracker_file + '.xlsx'
-        try:
-            tracker_wb = load_workbook(tracker_file)
-        except FileNotFoundError:
-            print('Unable to find the tracker file. Make sure it exists at the expected location')
-            input('\nPress any key to exit the program')
-        tracker_ws = tracker_wb.active
-        self.ws_art_works(ws)
-        project_starting_indices = self.ws_project_starting_indices()
-        self.ws_titles(ws)
-        self.ws_schedule()
-        self.ws_schedule_dates(ws)
-        tracker_schedule = self.ws_tracker_schedule()
-        self.ws_append(tracker_ws, tracker_schedule, project_starting_indices, tracker_wb)
-        fini = self.get_fini(tracker_ws)
-        tracker_ws.merge_cells(start_row=fini, start_column=1, end_row=fini, end_column=6)
-        tracker_file2 = input('Enter the tracker file to load: ')
-        tracker_file2 = tracker_file2 + '.xlsx'
-        try:
-            tracker_wb.save(tracker_file2)
-        except PermissionError:
-            print('\nUnable to save to the tracker. Please make sure the file isn\'t open')
-            input('\nPress any key to exit the program')
+        #'C:\\Users\\Feras\\Documents\\Work_Task_Automaiton'
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            schedule_file = self.schedule_E.get() + '.xlsm'
+            try:
+                os.chdir('R:\\LifeScan\\_Lifescan_General\\20_Personal_Folders\\Melanie\\Schedules')
+                wb = load_workbook(schedule_file)
+            except FileNotFoundError:
+                messagebox.showinfo("Error", "Unable to find the schedule file. Make sure it exists at the expected location")
+                quit()
+            ws = wb.active
+            tracker_file = self.tracker_E1.get() + '.xlsx'
+            try:
+                tracker_wb = load_workbook(tracker_file)
+            except FileNotFoundError:
+                messagebox.showinfo("Error", "Unable to find the tracker file. Make sure it exists at the expected location")
+                quit()
+            tracker_ws = tracker_wb.active
+            self.ws_art_works(ws)
+            project_starting_indices = self.ws_project_starting_indices()
+            self.ws_titles(ws)
+            self.ws_schedule()
+            self.ws_schedule_dates(ws)
+            tracker_schedule = self.ws_tracker_schedule()
+            self.ws_append(tracker_ws, tracker_schedule, project_starting_indices, tracker_wb)
+            fini = self.get_fini(tracker_ws)
+            tracker_ws.merge_cells(start_row=fini, start_column=1, end_row=fini, end_column=6)
+            tracker_file2 = self.tracker_E2.get() + '.xlsx'
+            try:
+                tracker_wb.save(tracker_file2)
+            except PermissionError:
+                messagebox.showinfo("Error", "\nUnable to save to the tracker. Please make sure the file isn\'t open")
+                quit()
 
 
 def main():
-    obj = WorkTaskAutomation()
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        obj.API()
+    window = tk.Tk()
+    obj = GUI(window)
+    window.mainloop()
 
 
 if __name__ == '__main__':
