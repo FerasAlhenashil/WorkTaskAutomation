@@ -1,4 +1,5 @@
-# WorkTaskAutomation
-Automating some of the tasks for Melanie's job using Python.
+### WorkTaskAutomation ###
+ 
+Automating some of the tasks for a client's job using Python.
 
-This programs takes Excel schedules from Melanies job and creates entries in an Excel spreadsheet tracker.
+This programs reads and parses Excel schedule files, creates new entries, then appends them to an Excel spreadsheet tracker.
